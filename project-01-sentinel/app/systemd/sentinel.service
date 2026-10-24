@@ -1,0 +1,10 @@
+[Unit]
+Description=DevOps Sentinel Health Monitoring Service
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/vboxuser/devops-sentinel/scripts/sentinel-health.sh
+User=vboxuser
+StandardOutput=journal
+StandardError=journal
