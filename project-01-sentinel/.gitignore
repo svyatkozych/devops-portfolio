@@ -1,0 +1,13 @@
+cat << 'EOF' > .gitignore
+# Editor swap/backup files
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary backups or logs
+app/logs/*
+app/data/*
+backups/*
+!backups/.gitkeep
+EOF

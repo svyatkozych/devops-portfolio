@@ -1,0 +1,11 @@
+[Unit]
+Description=Run DevOps Sentinel periodically
+Requires=sentinel.service
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
