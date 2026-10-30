@@ -1,0 +1,56 @@
+name: ReleaseGuard CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-verify:
+    name: 🧪 Quality Gate & Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r project-03-releaseguard/app/requirements.txt
+
+      - name: Run Unit Tests
+        run: |
+          PYTHONPATH=project-03-releaseguard pytest project-03-releaseguard/tests/
+
+  build-and-smoke-test:
+    name: 🐳 Build & Smoke Test (Rollback Guard)
+    needs: test-and-verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: |
+          docker build -t releaseguard:test project-03-releaseguard/app
+
+      - name: Run Temporary Container for Smoke Testing
+        run: |
+          docker run -d --name releaseguard_smoke -p 5000:5000 releaseguard:test
+          sleep 3
+
+      - name: Execute Smoke Tests
+        run: |
+          ./project-03-releaseguard/scripts/smoke_test.sh http://localhost:5000/health
+
+      - name: Cleanup Container
+        if: always()
+        run: |
+          docker stop releaseguard_smoke || true
+          docker rm releaseguard_smoke || true
