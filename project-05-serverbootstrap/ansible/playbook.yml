@@ -1,0 +1,18 @@
+---
+- name: Bootstrap and Configure Local Development Server
+  hosts: local_servers
+  become: no  # Працюємо локально від поточного користувача без запиту sudo-пароля
+
+  vars:
+    workspace_dir: "{{ lookup('env', 'HOME') }}/devops_workspace"
+
+  tasks:
+    - name: Ensure a dedicated DevOps portfolio working directory exists
+      file:
+        path: "{{ workspace_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Display verification message
+      debug:
+        msg: "ServerBootstrap successfully completed local configuration and directory verification!"
